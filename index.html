@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireFly-Forms</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #1a73e8;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: #1a73e8;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            margin: 0.5rem;
+        }
+
+        button:hover {
+            background-color: #1557b0;
+        }
+
+        .nav {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .nav a {
+            color: #1a73e8;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+
+        .response-card {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 4px;
+            border-left: 4px solid #1a73e8;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .admin-login {
+            max-width: 400px;
+            margin: 4rem auto;
+            text-align: center;
+        }
+
+        #error-message {
+            color: red;
+            margin-top: 1rem;
+        }
+
+        .admin-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .danger-btn {
+            background-color: #dc3545;
+        }
+
+        .danger-btn:hover {
+            background-color: #c82333;
+        }
+
+        .question-manager {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .question-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .question-item button {
+            margin-left: 1rem;
+        }
+
+        #dynamic-form-fields {
+            margin-bottom: 2rem;
+        }
+
+        /* Popup Styles */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 1rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .popup h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .popup button {
+            background-color: #1a73e8;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="#" onclick="showSection('survey-form')">Form</a>
+        <a href="#" onclick="showSection('admin-login')">Admin</a>
+    </div>
+
+    <!-- Custom Popup -->
+    <div id="popup" class="popup hidden">
+        <h3 id="popup-message"></h3>
+        <button onclick="closePopup()">OK</button>
+    </div>
+    <div id="overlay" class="overlay hidden" onclick="closePopup()"></div>
+
+    <!-- Survey Form Section -->
+    <div id="survey-form" class="container">
+        <h1>Form</h1>
+        <form id="feedbackForm">
+            <div id="dynamic-form-fields">
+                <!-- Dynamic questions will be inserted here -->
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <!-- Admin Login Section -->
+    <div id="admin-login" class="container hidden">
+        <div class="admin-login">
+            <h1>Admin Login</h1>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password">
+            </div>
+            <button onclick="login()">Login</button>
+            <div id="error-message"></div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Section -->
+    <div id="admin-panel" class="container hidden">
+        <div class="admin-controls">
+            <button onclick="logout()">Logout</button>
+            <button class="danger-btn" onclick="clearResponses()">Clear All Responses</button>
+        </div>
+        
+        <div class="question-manager">
+            <h2>Manage Questions</h2>
+            <div class="form-group">
+                <label for="questionText">Question Text:</label>
+                <input type="text" id="questionText">
+            </div>
+            <div class="form-group">
+                <label for="questionType">Question Type:</label>
+                <select id="questionType">
+                    <option value="text">Text Input</option>
+                    <option value="email">Email</option>
+                    <option value="select">Select Options</option>
+                    <option value="textarea">Text Area</option>
+                    <option value="number">Number</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="requiredCheckbox">
+                <label for="requiredCheckbox">Required</label>
+            </div>
+            <div class="form-group" id="optionsGroup" style="display: none;">
+                <label for="options">Options (comma-separated):</label>
+                <input type="text" id="options" placeholder="Option1, Option2, Option3">
+            </div>
+            <div class="form-group">
+                <label for="minValue">Min Value (for numbers):</label>
+                <input type="number" id="minValue">
+            </div>
+            <div class="form-group">
+                <label for="maxValue">Max Value (for numbers):</label>
+                <input type="number" id="maxValue">
+            </div>
+            <button onclick="addQuestion()">Add Question</button>
+            <div id="questionsList"></div>
+        </div>
+
+        <h2>Form Responses</h2>
+        <div id="responses"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script>
+        // Password hashing function
+        function hashPassword(password) {
+            return CryptoJS.SHA256(password).toString();
+        }
+
+        // Popup functions
+        function showPopup(message) {
+            document.getElementById("popup-message").innerText = message;
+            document.getElementById("popup").classList.remove("hidden");
+            document.getElementById("overlay").classList.remove("hidden");
+        }
+
+        function closePopup() {
+            document.getElementById("popup").classList.add("hidden");
+            document.getElementById("overlay").classList.add("hidden");
+        }
+
+        // Admin credentials with password hash
+        const ADMIN_USERNAME = 'Rudra009';
+        const ADMIN_PASSWORD_HASH = hashPassword('Rudra9');
+
+        // Admin login function with hashing
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+
+            if (username === ADMIN_USERNAME && hashPassword(password) === ADMIN_PASSWORD_HASH) {
+                showSection('admin-panel');
+                displayResponses();
+                updateQuestionsList();
+                errorMessage.textContent = '';
+            } else {
+                errorMessage.textContent = 'Invalid credentials';
+            }
+        }
+
+        // Logout function
+        function logout() {
+            showSection('admin-login');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('error-message').textContent = '';
+        }
+
+        // Section navigation
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.container');
+            sections.forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        // Load survey questions
+        function loadQuestions() {
+            const questions = JSON.parse(localStorage.getItem('surveyQuestions')) || [];
+            return questions;
+        }
+
+        function saveQuestions(questions) {
+            localStorage.setItem('surveyQuestions', JSON.stringify(questions));
+        }
+
+        // Add new question with min/max and required options
+        function addQuestion() {
+            const text = document.getElementById('questionText').value;
+            const type = document.getElementById('questionType').value;
+            const required = document.getElementById('requiredCheckbox').checked;
+            const minDigits = document.getElementById('minValue').value; // Use for digit length
+            const maxDigits = document.getElementById('maxValue').value; // Use for digit length
+            const options = type === 'select' ? document.getElementById('options').value.split(',').map(opt => opt.trim()) : [];
+        
+            if (!text) {
+                showPopup('Please enter question text');
+                return;
+            }
+        
+            const questions = loadQuestions();
+            const newQuestion = {
+                id: 'q' + Date.now(),
+                text,
+                type,
+                required,
+                minDigits,
+                maxDigits,
+                options
+            };
+        
+            questions.push(newQuestion);
+            saveQuestions(questions);
+        
+            document.getElementById('questionText').value = '';
+            document.getElementById('questionType').value = 'text';
+            document.getElementById('options').value = '';
+            document.getElementById('optionsGroup').style.display = 'none';
+            document.getElementById('requiredCheckbox').checked = false;
+            document.getElementById('minValue').value = ''; // Clear min value
+            document.getElementById('maxValue').value = ''; // Clear max value
+        
+            updateQuestionsList();
+            renderSurveyForm();
+        }
+
+        // Update questions list in admin panel
+        function updateQuestionsList() {
+            const questions = loadQuestions();
+            const questionsList = document.getElementById('questionsList');
+            questionsList.innerHTML = '';
+            questions.forEach(question => {
+                const questionItem = document.createElement('div');
+                questionItem.classList.add('question-item');
+                questionItem.innerHTML = `
+                    <span>${question.text}</span>
+                    <button onclick="deleteQuestion('${question.id}')">Delete</button>
+                `;
+                questionsList.appendChild(questionItem);
+            });
+        }
+
+        // Render survey form for users
+        function renderSurveyForm() {
+            const questions = loadQuestions();
+            const formFields = document.getElementById('dynamic-form-fields');
+            formFields.innerHTML = '';
+            questions.forEach(question => {
+                const formGroup = document.createElement('div');
+                formGroup.classList.add('form-group');
+                let inputElement;
+        
+                // Generate input based on question type
+                switch (question.type) {
+                    case 'text':
+                    case 'email':
+                        inputElement = document.createElement('input');
+                        inputElement.type = question.type;
+                        break;
+                    case 'number':
+                        inputElement = document.createElement('input');
+                        inputElement.type = 'number';
+                        // Add custom validation for digit length
+                        inputElement.setAttribute('maxlength', question.maxDigits);
+                        inputElement.oninput = function() {
+                            const value = this.value;
+                            const minLength = question.minDigits;
+                            const maxLength = question.maxDigits;
+                            if (value.length < minLength || value.length > maxLength) {
+                                this.setCustomValidity(`Please enter a number with ${minLength} to ${maxLength} digits.`);
+                            } else {
+                                this.setCustomValidity('');
+                            }
+                        };
+                        break;
+                    case 'select':
+                        inputElement = document.createElement('select');
+                        question.options.forEach(option => {
+                            const optionElement = document.createElement('option');
+                            optionElement.value = option;
+                            optionElement.textContent = option;
+                            inputElement.appendChild(optionElement);
+                        });
+                        break;
+                    case 'textarea':
+                        inputElement = document.createElement('textarea');
+                        break;
+                }
+        
+                inputElement.name = question.id;
+                inputElement.required = question.required;
+        
+                const label = document.createElement('label');
+                label.textContent = question.text;
+                label.htmlFor = question.id;
+        
+                formGroup.appendChild(label);
+                formGroup.appendChild(inputElement);
+                formFields.appendChild(formGroup);
+            });
+        }
+        // Delete a question
+        function deleteQuestion(id) {
+            const questions = loadQuestions().filter(q => q.id !== id);
+            saveQuestions(questions);
+            updateQuestionsList();
+            renderSurveyForm();
+        }
+
+        // Submit survey form
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const response = {};
+            formData.forEach((value, key) => {
+                response[key] = value;
+            });
+
+            const responses = JSON.parse(localStorage.getItem('surveyResponses')) || [];
+            responses.push(response);
+            localStorage.setItem('surveyResponses', JSON.stringify(responses));
+
+            e.target.reset();
+            showPopup('Form submitted successfully!');
+        });
+
+        // Display responses
+        function displayResponses() {
+            const responses = JSON.parse(localStorage.getItem('surveyResponses')) || [];
+            const responseContainer = document.getElementById('responses');
+            responseContainer.innerHTML = '';
+            responses.forEach((response, index) => {
+                const responseCard = document.createElement('div');
+                responseCard.classList.add('response-card');
+                responseCard.innerHTML = `<h4>Response ${index + 1}</h4>`;
+                for (const key in response) {
+                    const question = loadQuestions().find(q => q.id === key);
+                    if (question) {
+                        responseCard.innerHTML += `<p><strong>${question.text}:</strong> ${response[key]}</p>`;
+                    }
+                }
+                responseContainer.appendChild(responseCard);
+            });
+        }
+
+        // Clear all responses
+        function clearResponses() {
+            localStorage.removeItem('surveyResponses');
+            displayResponses();
+            showPopup('All responses cleared!');
+        }
+
+        // Initialize form
+        renderSurveyForm();
+
+        // Show/Hide options input based on question type
+        document.getElementById('questionType').addEventListener('change', function() {
+            if (this.value === 'select') {
+                document.getElementById('optionsGroup').style.display = 'block';
+            } else {
+                document.getElementById('optionsGroup').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
