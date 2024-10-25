@@ -279,7 +279,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <script>
-        // Password hashing function
         function hashPassword(password) {
             return CryptoJS.SHA256(password).toString();
         }
@@ -520,6 +519,50 @@
                 document.getElementById('optionsGroup').style.display = 'none';
             }
         });
+
+        // Function to display form responses
+        function displayResponses() {
+            const responses = JSON.parse(localStorage.getItem('formResponses')) || [];
+            const responsesContainer = document.getElementById('responses');
+            responsesContainer.innerHTML = '';
+
+            responses.forEach(response => {
+                const responseCard = document.createElement('div');
+                responseCard.classList.add('response-card');
+
+                for (let key in response) {
+                    const p = document.createElement('p');
+                    p.textContent = `${key}: ${response[key]}`;
+                    responseCard.appendChild(p);
+                }
+                responsesContainer.appendChild(responseCard);
+            });
+        }
+
+        // Save form response
+        document.getElementById('feedbackForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const response = {};
+
+            formData.forEach((value, key) => {
+                response[key] = value;
+            });
+
+            const responses = JSON.parse(localStorage.getItem('formResponses')) || [];
+            responses.push(response);
+            localStorage.setItem('formResponses', JSON.stringify(responses));
+
+            event.target.reset();
+            showPopup('Your response has been submitted!');
+        });
+
+        // Clear all responses
+        function clearResponses() {
+            localStorage.removeItem('formResponses');
+            displayResponses();
+            showPopup('All responses have been cleared.');
+        }
     </script>
 </body>
 </html>
