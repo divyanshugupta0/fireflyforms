@@ -431,7 +431,7 @@
             peer = new Peer();
             
             peer.on('open', (id) => {
-                const shareLink = `${window.location.origin}/user.html?admin=${id}`;
+                const shareLink = `${window.location.origin}/fireflyforms/user?admin=${id}`;
                 document.getElementById('shareLink').textContent = shareLink;
             });
 
