@@ -3,188 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Message Panel</title>
+    <title>Dynamic Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #22c55e;
+            --border: #e2e8f0;
+            --light: #f8fafc;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
         }
 
         body {
-            background-color: #f0f2f5;
-            padding: 20px;
+            background: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
         }
 
-        .container {
+        .form-container {
+            width: 100%;
             max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .panel {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
-        h2 {
-            color: #1a73e8;
-            margin-bottom: 20px;
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        .form-logo {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            color: #64748b;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 2rem;
+        }
+
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
-            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #64748b;
         }
 
         input, textarea {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.15s ease-in-out;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         textarea {
-            height: 100px;
             resize: vertical;
+            min-height: 100px;
         }
 
-        button {
-            background: #1a73e8;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
+            border-radius: 0.5rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.15s ease-in-out;
         }
 
-        button:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
+        .btn:hover {
+            background: var(--primary-hover);
         }
 
-        button:hover:not(:disabled) {
-            background: #1557b0;
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: var(--success);
         }
 
-        .message {
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .success-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
         }
 
         .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="panel">
-            <h2>Send Message</h2>
-            <form id="userForm">
-                <div class="form-group">
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" required>
+    <div class="form-container">
+        <div id="loader" class="loading">
+            <i class="fas fa-circle-notch fa-spin loading-spinner"></i>
+            Connecting to form...
+        </div>
+
+        <div id="formContent" style="display: none;">
+            <div class="form-header">
+                <div class="form-logo">
+                    <i class="fas fa-clipboard-list"></i>
                 </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="subject">Subject:</label>
-                    <input type="text" id="subject" name="subject" required>
-                </div>
-                <div class="form-group">
-                    <label for="message">Message:</label>
-                    <textarea id="message" name="message" required></textarea>
-                </div>
-                <button type="submit" id="submitButton">Send Message</button>
+                <h1 class="form-title">Dynamic Form</h1>
+            </div>
+
+            <form id="dynamicForm">
+                <div id="formQuestions"></div>
+                <button type="submit" class="btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Response
+                </button>
             </form>
-            <div id="statusMessage"></div>
+        </div>
+
+        <div id="successMessage" class="success-message">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h2>Thank You!</h2>
+            <p>Your response has been submitted successfully.</p>
         </div>
     </div>
 
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <script>
-        const userForm = document.getElementById('userForm');
-        const statusMessage = document.getElementById('statusMessage');
-        const submitButton = document.getElementById('submitButton');
+        let peer;
+        let conn;
 
-        // Replace with your Web3Forms API key
-        const WEB3FORMS_API_KEY = '464fa756-93d7-4774-bec4-a2b32f4db800';
+        function getAdminPeerId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('admin');
+        }
 
-        userForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            submitButton.disabled = true;
+        function initializePeer() {
+            peer = new Peer();
             
-            const formData = new FormData(userForm);
-            const messageData = {
-                id: Date.now(),
-                name: formData.get('name'),
-                email: formData.get('email'),
-                subject: formData.get('subject'),
-                message: formData.get('message'),
-                timestamp: new Date().toLocaleString(),
-                status: 'unread'
-            };
+            peer.on('open', (id) => {
+                const adminId = getAdminPeerId();
+                if (adminId) {
+                    conn = peer.connect(adminId);
+                    
+                    conn.on('open', () => {
+                        document.getElementById('loader').style.display = 'none';
+                        document.getElementById('formContent').style.display = 'block';
+                    });
 
-            try {
-                // Send to Web3Forms
-                const web3FormsData = new FormData();
-                web3FormsData.append('access_key', WEB3FORMS_API_KEY);
-                web3FormsData.append('from_name', messageData.name);
-                web3FormsData.append('subject', messageData.subject);
-                web3FormsData.append('message', messageData.message);
-                web3FormsData.append('email', messageData.email);
-
-                const response = await fetch('https://api.web3forms.com/submit', {
-                    method: 'POST',
-                    body: web3FormsData
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    // Store message in localStorage
-                    const messages = JSON.parse(localStorage.getItem('userMessages') || '[]');
-                    messages.push(messageData);
-                    localStorage.setItem('userMessages', JSON.stringify(messages));
-
-                    statusMessage.innerHTML = `
-                        <div class="message success">
-                            Message sent successfully! We'll get back to you soon.
-                        </div>
-                    `;
-                    userForm.reset();
-                } else {
-                    throw new Error(result.message || 'Failed to send message');
+                    conn.on('data', (data) => {
+                        if (data.type === 'formUpdate') {
+                            updateForm(data.questions);
+                        }
+                    });
                 }
-            } catch (error) {
-                statusMessage.innerHTML = `
-                    <div class="message error">
-                        Failed to send message: ${error.message}. Please try again.
+            });
+
+            peer.on('error', (error) => {
+                document.getElementById('loader').innerHTML = `
+                    <div style="color: #ef4444;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Connection error. Please try again later.
                     </div>
                 `;
-            } finally {
-                submitButton.disabled = false;
-            }
+            });
+        }
+
+        function updateForm(questions) {
+            const formQuestions = document.getElementById('formQuestions');
+            formQuestions.innerHTML = '';
+
+            questions.forEach((question, index) => {
+                const inputGroup = document.createElement('div');
+                inputGroup.className = 'input-group fade-in';
+                
+                const label = document.createElement('label');
+                label.textContent = question.text + (question.required ? ' *' : '');
+                
+                let input;
+                if (question.type === 'textarea') {
+                    input = document.createElement('textarea');
+                } else {
+                    input = document.createElement('input');
+                    input.type = question.type;
+                }
+                
+                input.name = `question_${index}`;
+                input.required = question.required;
+                
+                const error = document.createElement('div');
+                error.className = 'error';
+                
+                inputGroup.appendChild(label);
+                inputGroup.appendChild(input);
+                inputGroup.appendChild(error);
+                formQuestions.appendChild(inputGroup);
+            });
+        }
+
+        function showSuccess() {
+            document.getElementById('formContent').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+                document.getElementById('formContent').style.display = 'block';
+                document.getElementById('dynamicForm').reset();
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePeer();
+
+            document.getElementById('dynamicForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const responses = [];
+                e.target.querySelectorAll('input, textarea').forEach((input) => {
+                    responses.push(input.value);
+                });
+
+                conn.send({
+                    type: 'formSubmission',
+                    responses: responses
+                });
+
+                showSuccess();
+            });
         });
     </script>
 </body>
