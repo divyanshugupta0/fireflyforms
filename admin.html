@@ -3,292 +3,631 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Form Builder - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #64748b;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --border: #e2e8f0;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
         }
 
         body {
-            background-color: #f0f2f5;
-            padding: 20px;
+            background: #f1f5f9;
+            min-height: 100vh;
+            line-height: 1.5;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 1.5rem;
         }
 
-        .panel {
+        /* Login Form */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 2.5rem;
             background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
-        .header {
+        .login-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            font-size: 2.5rem;
+        }
+
+        .login-title {
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Form Elements */
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--secondary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.15s ease-in-out;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        .navbar-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        h2 {
-            color: #1a73e8;
+        .logo {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: bold;
         }
 
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        button {
-            background: #1a73e8;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        button:hover {
-            background: #1557b0;
-        }
-
-        button.delete {
-            background: #dc3545;
-        }
-
-        button.delete:hover {
-            background: #c82333;
-        }
-
-        .message-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            border-left: 4px solid #1a73e8;
-            position: relative;
-        }
-
-        .message-card.unread {
-            background: #fff;
-            border-left-color: #dc3545;
-        }
-
-        .message-header {
+        .card-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            color: #666;
-            font-size: 0.9em;
+            align-items: center;
+            margin-bottom: 1.5rem;
         }
 
-        .message-content {
-            margin-bottom: 10px;
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
         }
 
-        .message-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .filters {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .filter-btn {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            color: #333;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .filter-btn.active {
-            background: #1a73e8;
-            color: white;
-            border-color: #1a73e8;
-        }
-
-        .search {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 20px;
-        }
-
-        .stats {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .stat-card {
-            background: #fff;
-            padding: 15px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            flex: 1;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            text-align: center;
         }
 
-        .stat-number {
-            font-size: 24px;
+        .stat-value {
+            font-size: 2rem;
             font-weight: bold;
-            color: #1a73e8;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
         }
 
         .stat-label {
-            color: #666;
-            font-size: 0.9em;
+            color: var(--secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Form Builder */
+        .form-question {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Share Section */
+        .share-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .share-link {
+            flex: 1;
+            background: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            border: 1px solid var(--border);
+            user-select: all;
+        }
+
+        /* Responses */
+        .response {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+
+        .response:hover {
+            transform: translateY(-2px);
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .response-time {
+            font-size: 0.875rem;
+            color: var(--secondary);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="panel">
-            <div class="header">
-                <h2>Admin Message Panel</h2>
-                <button id="clearAll" class="delete">Clear All Messages</button>
-            </div>
+<body oncontextmenu="return false;">
+    <!-- Login Form -->
+    <div class="login-container fade-in" id="loginForm">
+        <div class="login-logo">
+            <i class="fas fa-clipboard-list"></i>
+        </div>
+        <h2 class="login-title">Admin Login</h2>
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter your username">
+        </div>
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter your password">
+        </div>
+        <button class="btn btn-primary" onclick="login()" style="width: 100%">
+            <i class="fas fa-sign-in-alt"></i>
+            Login
+        </button>
+    </div>
 
-            <div class="stats">
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel" style="display: none;">
+        <div class="navbar">
+            <div class="navbar-content">
+                <div class="logo">
+                    <i class="fas fa-clipboard-list"></i> Form Builder
+                </div>
+                <div class="user-menu">
+                    <span id="welcomeMessage">Welcome, Admin</span>
+                    <button class="btn btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-number" id="totalMessages">0</div>
-                    <div class="stat-label">Total Messages</div>
+                    <div class="stat-value" id="totalResponses">0</div>
+                    <div class="stat-label">Total Responses</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="unreadMessages">0</div>
-                    <div class="stat-label">Unread Messages</div>
+                    <div class="stat-value" id="todayResponses">0</div>
+                    <div class="stat-label">Today's Responses</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="readMessages">0</div>
-                    <div class="stat-label">Read Messages</div>
+                    <div class="stat-value" id="activeUsers">0</div>
+                    <div class="stat-label">Active Users</div>
                 </div>
             </div>
 
-            <input type="text" id="searchInput" class="search" placeholder="Search messages...">
-
-            <div class="filters">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="unread">Unread</button>
-                <button class="filter-btn" data-filter="read">Read</button>
+            <!-- Form Builder -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Form Builder</h2>
+                    <button class="btn btn-primary" onclick="addQuestion()">
+                        <i class="fas fa-plus"></i>
+                        Add Question
+                    </button>
+                </div>
+                <div id="questions"></div>
+                <button class="btn btn-primary" onclick="publishForm()">
+                    <i class="fas fa-paper-plane"></i>
+                    Publish Form
+                </button>
             </div>
 
-            <div id="messageList"></div>
+            <!-- Share Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Share Form</h2>
+                </div>
+                <div class="share-section">
+                    <div class="share-link" id="shareLink"></div>
+                    <button class="btn btn-primary" onclick="copyShareLink()">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <!-- Responses -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Responses</h2>
+                </div>
+                <div id="responses"></div>
+            </div>
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
     <script>
-        const messageList = document.getElementById('messageList');
-        const searchInput = document.getElementById('searchInput');
-        const clearAllBtn = document.getElementById('clearAll');
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        let currentFilter = 'all';
+        // Constants
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = 'admin123';
+        
+        // Global Variables
+        let peer;
+        let connections = [];
+        let formQuestions = [];
+        let stats = {
+            totalResponses: 0,
+            todayResponses: 0,
+            activeUsers: 0
+        };
 
-        function updateStats() {
-            const messages = JSON.parse(localStorage.getItem('userMessages') || '[]');
-            const unreadCount = messages.filter(msg => msg.status === 'unread').length;
+        // Login/Logout Functions
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                initializePeer();
+                showToast('Logged in successfully!', 'success');
+            } else {
+                showToast('Invalid credentials!', 'error');
+            }
+        }
+
+        function logout() {
+            if (peer) peer.destroy();
+            location.reload();
+        }
+
+        // Peer Connection Setup
+        function initializePeer() {
+            peer = new Peer();
             
-            document.getElementById('totalMessages').textContent = messages.length;
-            document.getElementById('unreadMessages').textContent = unreadCount;
-            document.getElementById('readMessages').textContent = messages.length - unreadCount;
-        }
-
-        function displayMessages(filter = 'all', searchTerm = '') {
-            const messages = JSON.parse(localStorage.getItem('userMessages') || '[]');
-            messageList.innerHTML = '';
-
-            messages
-                .filter(msg => {
-                    const matchesFilter = filter === 'all' || msg.status === filter;
-                    const matchesSearch = searchTerm === '' || 
-                        Object.values(msg).some(value => 
-                            String(value).toLowerCase().includes(searchTerm.toLowerCase())
-                        );
-                    return matchesFilter && matchesSearch;
-                })
-                .sort((a, b) => b.id - a.id)
-                .forEach(msg => {
-                    const messageCard = document.createElement('div');
-                    messageCard.className = `message-card ${msg.status}`;
-                    messageCard.innerHTML = `
-                        <div class="message-header">
-                            <span>From: ${msg.name} (${msg.email})</span>
-                            <span>${msg.timestamp}</span>
-                        </div>
-                        <div class="message-content">
-                            <strong>Subject:</strong> ${msg.subject}<br>
-                            <strong>Message:</strong><br>
-                            ${msg.message}
-                        </div>
-                        <div class="message-actions">
-                            <button onclick="toggleMessageStatus(${msg.id})">${msg.status === 'unread' ? 'Mark as Read' : 'Mark as Unread'}</button>
-                            <button class="delete" onclick="deleteMessage(${msg.id})">Delete</button>
-                        </div>
-                    `;
-                    messageList.appendChild(messageCard);
-                });
-            
-            updateStats();
-        }
-
-        function toggleMessageStatus(id) {
-            const messages = JSON.parse(localStorage.getItem('userMessages') || '[]');
-            const index = messages.findIndex(msg => msg.id === id);
-            if (index !== -1) {
-                messages[index].status = messages[index].status === 'unread' ? 'read' : 'unread';
-                localStorage.setItem('userMessages', JSON.stringify(messages));
-                displayMessages(currentFilter, searchInput.value);
-            }
-        }
-
-        function deleteMessage(id) {
-            if (confirm('Are you sure you want to delete this message?')) {
-                const messages = JSON.parse(localStorage.getItem('userMessages') || '[]');
-                const filteredMessages = messages.filter(msg => msg.id !== id);
-                localStorage.setItem('userMessages', JSON.stringify(filteredMessages));
-                displayMessages(currentFilter, searchInput.value);
-            }
-        }
-
-        clearAllBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to clear all messages? This cannot be undone.')) {
-                localStorage.setItem('userMessages', '[]');
-                displayMessages();
-            }
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            displayMessages(currentFilter, e.target.value);
-        });
-
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentFilter = btn.dataset.filter;
-                displayMessages(currentFilter, searchInput.value);
+            peer.on('open', (id) => {
+                const shareLink = `${window.location.origin}/user.html?admin=${id}`;
+                document.getElementById('shareLink').textContent = shareLink;
             });
+
+            peer.on('connection', (conn) => {
+                connections.push(conn);
+                updateStats();
+                
+                conn.on('data', handlePeerData);
+                conn.on('close', () => {
+                    connections = connections.filter(c => c !== conn);
+                    updateStats();
+                });
+            });
+        }
+
+        // Form Builder Functions
+        function addQuestion() {
+            const questionsDiv = document.getElementById('questions');
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'form-question fade-in';
+            
+            const questionNumber = questionsDiv.children.length + 1;
+            
+            questionDiv.innerHTML = `
+                <div class="question-header">
+                    <h3>Question ${questionNumber}</h3>
+                    <div class="question-actions">
+                        <button class="btn btn-secondary" onclick="moveQuestion(this, 'up')">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="btn btn-secondary" onclick="moveQuestion(this, 'down')">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button class="btn btn-danger" onclick="removeQuestion(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Question Text</label>
+                    <input type="text" class="question-text" placeholder="Enter your question">
+                </div>
+                <div class="input-group">
+                    <label>Question Type</label>
+                    <select class="question-type">
+                        // Continue from the select options...
+                        <option value="text">Text</option>
+                        <option value="number">Number</option>
+                        <option value="email">Email</option>
+                        <option value="date">Date</option>
+                        <option value="tel">Phone</option>
+                        <option value="url">Website URL</option>
+                        <option value="textarea">Long Text</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>
+                        <input type="checkbox" class="question-required"> Required Field
+                    </label>
+                </div>
+            `;
+            
+            questionsDiv.appendChild(questionDiv);
+        }
+
+        function moveQuestion(btn, direction) {
+            const questionDiv = btn.closest('.form-question');
+            if (direction === 'up' && questionDiv.previousElementSibling) {
+                questionDiv.parentNode.insertBefore(questionDiv, questionDiv.previousElementSibling);
+            } else if (direction === 'down' && questionDiv.nextElementSibling) {
+                questionDiv.parentNode.insertBefore(questionDiv.nextElementSibling, questionDiv);
+            }
+            updateQuestionNumbers();
+        }
+
+        function removeQuestion(btn) {
+            btn.closest('.form-question').remove();
+            updateQuestionNumbers();
+        }
+
+        function updateQuestionNumbers() {
+            document.querySelectorAll('.form-question').forEach((question, index) => {
+                question.querySelector('h3').textContent = `Question ${index + 1}`;
+            });
+        }
+
+        function publishForm() {
+            const questions = [];
+            document.querySelectorAll('.form-question').forEach((questionDiv) => {
+                questions.push({
+                    text: questionDiv.querySelector('.question-text').value,
+                    type: questionDiv.querySelector('.question-type').value,
+                    required: questionDiv.querySelector('.question-required').checked
+                });
+            });
+
+            formQuestions = questions;
+            connections.forEach(conn => {
+                conn.send({
+                    type: 'formUpdate',
+                    questions: questions
+                });
+            });
+
+            showToast('Form published successfully!', 'success');
+        }
+
+        // Response Handling
+        function handlePeerData(data) {
+            if (data.type === 'formSubmission') {
+                handleFormSubmission(data.responses);
+            }
+        }
+
+        function handleFormSubmission(responses) {
+            const responseDiv = document.createElement('div');
+            responseDiv.className = 'response fade-in';
+            
+            const currentTime = new Date().toLocaleString();
+            
+            let responseHtml = `
+                <div class="response-header">
+                    <h3>Response #${stats.totalResponses + 1}</h3>
+                    <span class="response-time">${currentTime}</span>
+                </div>
+            `;
+
+            formQuestions.forEach((question, index) => {
+                responseHtml += `
+                    <div class="response-item">
+                        <strong>${question.text}:</strong>
+                        <p>${responses[index] || 'No answer'}</p>
+                    </div>
+                `;
+            });
+
+            responseDiv.innerHTML = responseHtml;
+            document.getElementById('responses').prepend(responseDiv);
+            
+            updateStats('newResponse');
+        }
+
+        // Stats Management
+        function updateStats(type = null) {
+            if (type === 'newResponse') {
+                stats.totalResponses++;
+                stats.todayResponses++;
+            }
+            
+            stats.activeUsers = connections.length;
+            
+            document.getElementById('totalResponses').textContent = stats.totalResponses;
+            document.getElementById('todayResponses').textContent = stats.todayResponses;
+            document.getElementById('activeUsers').textContent = stats.activeUsers;
+        }
+
+        // Utility Functions
+        function copyShareLink() {
+            const shareLink = document.getElementById('shareLink').textContent;
+            navigator.clipboard.writeText(shareLink)
+                .then(() => showToast('Link copied to clipboard!', 'success'))
+                .catch(() => showToast('Failed to copy link', 'error'));
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            toast.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Event Listeners
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && document.getElementById('loginForm').style.display !== 'none') {
+                login();
+            }
         });
 
-        // Initial display
-        displayMessages();
-
-        // Auto-refresh messages every 30 seconds
-        setInterval(() => {
-            displayMessages(currentFilter, searchInput.value);
-        }, 30000);
+        // Reset stats at midnight
+        const now = new Date();
+        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        const timeUntilMidnight = tomorrow - now;
+        
+        setTimeout(() => {
+            stats.todayResponses = 0;
+            document.getElementById('todayResponses').textContent = '0';
+            // Set up the next day's reset
+            setInterval(() => {
+                stats.todayResponses = 0;
+                document.getElementById('todayResponses').textContent = '0';
+            }, 24 * 60 * 60 * 1000);
+        }, timeUntilMidnight);
     </script>
 </body>
 </html>
