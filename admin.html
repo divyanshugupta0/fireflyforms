@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #1a73e8;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #1557b0;
+        }
+
+        button.delete {
+            background: #dc3545;
+        }
+
+        button.delete:hover {
+            background: #c82333;
+        }
+
+        .message-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 4px solid #1a73e8;
+            position: relative;
+        }
+
+        .message-card.unread {
+            background: #fff;
+            border-left-color: #dc3545;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .message-content {
+            margin-bottom: 10px;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .filter-btn {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+        }
+
+        .search {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a73e8;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel">
+            <div class="header">
+                <h2>Admin Message Panel</h2>
+                <button id="clearAll" class="delete">Clear All Messages</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalMessages">0</div>
+                    <div class="stat-label">Total Messages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="unreadMessages">0</div>
+                    <div class="stat-label">Unread Messages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="readMessages">0</div>
+                    <div class="stat-label">Read Messages</div>
+                </div>
+            </div>
+
+            <input type="text" id="searchInput" class="search" placeholder="Search messages...">
+
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="unread">Unread</button>
+                <button class="filter-btn" data-filter="read">Read</button>
+            </div>
+
+            <div id="messageList"></div>
+        </div>
+    </div>
+
+    <script>
+        const messageList = document.getElementById('messageList');
+        const searchInput = document.getElementById('searchInput');
+        const clearAllBtn = document.getElementById('clearAll');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        let currentFilter = 'all';
+
+        function updateStats() {
+            const messages = JSON.parse(localStorage.getItem('userMessages') || '[]');
+            const unreadCount = messages.filter(msg => msg.status === 'unread').length;
+            
+            document.getElementById('totalMessages').textContent = messages.length;
+            document.getElementById('unreadMessages').textContent = unreadCount;
+            document.getElementById('readMessages').textContent = messages.length - unreadCount;
+        }
+
+        function displayMessages(filter = 'all', searchTerm = '') {
+            const messages = JSON.parse(localStorage.getItem('userMessages') || '[]');
+            messageList.innerHTML = '';
+
+            messages
+                .filter(msg => {
+                    const matchesFilter = filter === 'all' || msg.status === filter;
+                    const matchesSearch = searchTerm === '' || 
+                        Object.values(msg).some(value => 
+                            String(value).toLowerCase().includes(searchTerm.toLowerCase())
+                        );
+                    return matchesFilter && matchesSearch;
+                })
+                .sort((a, b) => b.id - a.id)
+                .forEach(msg => {
+                    const messageCard = document.createElement('div');
+                    messageCard.className = `message-card ${msg.status}`;
+                    messageCard.innerHTML = `
+                        <div class="message-header">
+                            <span>From: ${msg.name} (${msg.email})</span>
+                            <span>${msg.timestamp}</span>
+                        </div>
+                        <div class="message-content">
+                            <strong>Subject:</strong> ${msg.subject}<br>
+                            <strong>Message:</strong><br>
+                            ${msg.message}
+                        </div>
+                        <div class="message-actions">
+                            <button onclick="toggleMessageStatus(${msg.id})">${msg.status === 'unread' ? 'Mark as Read' : 'Mark as Unread'}</button>
+                            <button class="delete" onclick="deleteMessage(${msg.id})">Delete</button>
+                        </div>
+                    `;
+                    messageList.appendChild(messageCard);
+                });
+            
+            updateStats();
+        }
+
+        function toggleMessageStatus(id) {
+            const messages = JSON.parse(localStorage.getItem('userMessages') || '[]');
+            const index = messages.findIndex(msg => msg.id === id);
+            if (index !== -1) {
+                messages[index].status = messages[index].status === 'unread' ? 'read' : 'unread';
+                localStorage.setItem('userMessages', JSON.stringify(messages));
+                displayMessages(currentFilter, searchInput.value);
+            }
+        }
+
+        function deleteMessage(id) {
+            if (confirm('Are you sure you want to delete this message?')) {
+                const messages = JSON.parse(localStorage.getItem('userMessages') || '[]');
+                const filteredMessages = messages.filter(msg => msg.id !== id);
+                localStorage.setItem('userMessages', JSON.stringify(filteredMessages));
+                displayMessages(currentFilter, searchInput.value);
+            }
+        }
+
+        clearAllBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all messages? This cannot be undone.')) {
+                localStorage.setItem('userMessages', '[]');
+                displayMessages();
+            }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            displayMessages(currentFilter, e.target.value);
+        });
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                displayMessages(currentFilter, searchInput.value);
+            });
+        });
+
+        // Initial display
+        displayMessages();
+
+        // Auto-refresh messages every 30 seconds
+        setInterval(() => {
+            displayMessages(currentFilter, searchInput.value);
+        }, 30000);
+    </script>
+</body>
+</html>
